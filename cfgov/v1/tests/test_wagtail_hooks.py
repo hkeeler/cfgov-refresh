@@ -1,9 +1,10 @@
 from django.core.cache import caches
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 
 from wagtail.tests.testapp.models import SimplePage
 from wagtail.tests.utils import WagtailTestUtils
 from wagtail.wagtailcore.models import Site
+from wagtail.wagtailcore.rich_text import DbWhitelister
 
 import mock
 
@@ -247,3 +248,45 @@ class TestResourceTagsFilter(TestCase, WagtailTestUtils):
             response.context['object_list'][1].title,
             'Test resource Banana'
         )
+
+
+class TestWhitelistOverride(SimpleTestCase):
+    # Borrowed from https://github.com/wagtail/wagtail/blob/v1.13.4/wagtail
+    # /wagtailcore/tests/test_dbwhitelister.py
+
+    def test_whitelist_hooks(self):
+        """Test that DbWhitelister does not strip new elements and attributes.
+
+        The new allowed elements and attributes are added in v1.wagtail_hooks.
+        """
+
+        input_html = '''
+<span class="schema-container"
+      itemprop="step"
+      itemscope=""
+      itemtype="http://schema.org/HowToSection">
+    <h4 itemprop="name">Step 1: Learn about the debt</h4>
+    <span class="schema-container" itemprop="itemListElement">
+        <table>
+            <thead>
+                <tr>
+                    <th>Col 1 header</th>
+                    <th>Col 2 header</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Row 1 Col 1</td>
+                    <td>Row 1 Col 2</td>
+                </tr>
+                <tr>
+                    <td>Row 2 Col 1</td>
+                    <td>Row 2 Col 2</td>
+                </tr>
+            </tbody>
+        </table>
+    </span>
+</span>
+        '''
+        output_html = DbWhitelister.clean(input_html)
+        self.assertHTMLEqual(input_html, output_html)
