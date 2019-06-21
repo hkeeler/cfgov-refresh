@@ -1,4 +1,4 @@
 -r base.txt
 -r postgres.txt
 mod_wsgi==4.6.5
-newrelic==2.96.0.80
+newrelic==4.18.0.118

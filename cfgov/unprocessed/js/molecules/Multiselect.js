@@ -1,15 +1,16 @@
 // Required modules.
 import * as arrayHelpers from '../modules/util/array-helpers';
 import * as atomicHelpers from '../modules/util/atomic-helpers';
-import { bindEvent } from '../modules/util/dom-events';
-import { create } from '../modules/util/dom-manipulators';
-import { stringMatch } from '../modules/util/strings';
 import EventObserver from '../modules/util/EventObserver';
 import MultiselectModel from './MultiselectModel';
+import { bindEvent } from '../modules/util/dom-events';
+import { create } from '../modules/util/dom-manipulators';
 
 const closeIcon = require(
   'svg-inline-loader!../../../../node_modules/cf-icons/src/icons/close.svg'
 );
+
+const BASE_CLASS = 'o-multiselect';
 
 /**
  * Multiselect
@@ -23,7 +24,6 @@ const closeIcon = require(
  */
 function Multiselect( element ) { // eslint-disable-line max-statements, inline-comments, max-len
 
-  const BASE_CLASS = 'o-multiselect';
   const LIST_CLASS = 'm-list';
   const CHECKBOX_INPUT_CLASS = 'a-checkbox';
   const TEXT_INPUT_CLASS = 'a-text-input';
@@ -105,7 +105,7 @@ function Multiselect( element ) { // eslint-disable-line max-statements, inline-
    * @returns {Multiselect} An instance.
    */
   function expand() {
-    _containerDom.classList.add( 'active' );
+    _containerDom.classList.add( 'u-active' );
     _fieldsetDom.classList.remove( 'u-invisible' );
     _fieldsetDom.setAttribute( 'aria-hidden', false );
     _instance.dispatchEvent( 'expandBegin', { target: _instance } );
@@ -118,7 +118,7 @@ function Multiselect( element ) { // eslint-disable-line max-statements, inline-
    * @returns {Multiselect} An instance.
    */
   function collapse() {
-    _containerDom.classList.remove( 'active' );
+    _containerDom.classList.remove( 'u-active' );
     _fieldsetDom.classList.add( 'u-invisible' );
     _fieldsetDom.setAttribute( 'aria-hidden', true );
     _model.resetIndex();
@@ -269,8 +269,8 @@ function Multiselect( element ) { // eslint-disable-line max-statements, inline-
       let _selectionsItemDom;
 
       if ( option.checked ) {
-        if ( _optionsDom.classList.contains( 'max-selections' ) ) {
-          _optionsDom.classList.remove( 'max-selections' );
+        if ( _optionsDom.classList.contains( 'u-max-selections' ) ) {
+          _optionsDom.classList.remove( 'u-max-selections' );
         }
 
         const dataOptionSel = '[data-option="' + option.value + '"]';
@@ -296,7 +296,7 @@ function Multiselect( element ) { // eslint-disable-line max-statements, inline-
       _model.toggleOption( optionIndex );
 
       if ( _model.isAtMaxSelections() ) {
-        _optionsDom.classList.add( 'max-selections' );
+        _optionsDom.classList.add( 'u-max-selections' );
       }
 
       _instance.dispatchEvent( 'selectionsUpdated', { target: _instance } );
@@ -497,5 +497,7 @@ function Multiselect( element ) { // eslint-disable-line max-statements, inline-
 
   return this;
 }
+
+Multiselect.BASE_CLASS = BASE_CLASS;
 
 export default Multiselect;

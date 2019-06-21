@@ -74,7 +74,7 @@ function isVisible( elem ) {
  */
 function removeDollarAddCommas( value ) {
   let parseValue = unFormatUSD( value );
-  parseValue = formatUSD( parseValue, { decimalPlaces: 0 } ).replace( '$', '' );
+  parseValue = formatUSD( { amount: parseValue, decimalPlaces: 0 } ).replace( '$', '' );
   return parseValue;
 }
 
@@ -139,7 +139,7 @@ function calcLoanAmount( housePrice, downPayment ) {
  * @param {number} loanAmount - A loan amount as a number.
  */
 function renderLoanAmount( elem, loanAmount ) {
-  elem.textContent = formatUSD( loanAmount, { decimalPlaces: 0 } );
+  elem.textContent = formatUSD( { amount: loanAmount, decimalPlaces: 0 } );
 }
 
 
@@ -149,7 +149,8 @@ function renderLoanAmount( elem, loanAmount ) {
  */
 function setSelections( fields ) {
   let val;
-  for ( const key in fields ) {
+  let key;
+  for ( key in fields ) {
     if ( Object.prototype.hasOwnProperty.call( fields, key ) ) {
       val = fields[key];
       const el = document.querySelector( '#' + key );

@@ -28,7 +28,8 @@ function getSearchValues( searchEl, filterEls ) {
  */
 function serializeFormFields( fields ) {
   fields = fields.map( field => {
-    for ( const key in field ) {
+    let key;
+    for ( key in field ) {
       field = `${ key }=${ field[key] }`;
     }
     return field;
@@ -58,6 +59,7 @@ function buildSearchResultsURL( base, params, opts ) {
  */
 function showLoading( el ) {
   el.style.opacity = 0.5;
+  el.className += ' is-loading';
   return el;
 }
 
@@ -69,6 +71,7 @@ function showLoading( el ) {
  */
 function hideLoading( el ) {
   el.style.opacity = 1;
+  el.className = el.className.replace( ' is-loading', '' );
   return el;
 }
 

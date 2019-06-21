@@ -27,7 +27,8 @@ describe( 'breakpoint-state', () => {
 
       const breakpointStateGet = breakpointState.get();
       // eslint-disable-next guard-for-in
-      for ( const stateKey in breakpointStateGet ) {
+      let stateKey;
+      for ( stateKey in breakpointStateGet ) {
         if ( breakpointStateGet[stateKey] === true ) trueValueCount++;
       }
 
@@ -39,13 +40,17 @@ describe( 'breakpoint-state', () => {
       let breakpointStateKey;
 
       // eslint-disable-next-line guard-for-in
-      for ( const rangeKey in breakpointsConfig ) {
-        width = breakpointsConfig[rangeKey].max ||
-                breakpointsConfig[rangeKey].min;
-        breakpointStateKey =
-          'is' + rangeKey.charAt( 0 ).toUpperCase() + rangeKey.slice( 1 );
+      let rangeKey;
+      for ( rangeKey in breakpointsConfig ) {
+        if ( {}.hasOwnProperty.call( breakpointsConfig, rangeKey ) ) {
+          width = breakpointsConfig[rangeKey].max ||
+                  breakpointsConfig[rangeKey].min;
+          breakpointStateKey =
+            'is' + rangeKey.charAt( 0 ).toUpperCase() + rangeKey.slice( 1 );
 
-        expect( breakpointState.get( width )[breakpointStateKey] ).toBe( true );
+          expect( breakpointState.get( width )[breakpointStateKey] )
+            .toBe( true );
+        }
       }
     } );
 

@@ -11,7 +11,7 @@ from wagtail.wagtailsearch import index
 from data_research.blocks import (
     ConferenceRegistrationForm, MortgageDataDownloads
 )
-from jobmanager.models import JobListingTable
+from jobmanager.blocks import JobListingTable
 from v1 import blocks as v1_blocks
 from v1.atomic_elements import molecules, organisms
 from v1.models.base import CFGOVPage
@@ -30,6 +30,7 @@ class BrowsePage(CFGOVPage):
         ('expandable_group', organisms.ExpandableGroup()),
         ('expandable', organisms.Expandable()),
         ('well', organisms.Well()),
+        ('video_player', organisms.VideoPlayer()),
         ('snippet_list', organisms.ResourceList()),
         ('table_block', organisms.AtomicTableBlock(
             table_options={'renderer': 'html'}

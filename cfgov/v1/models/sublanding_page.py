@@ -1,5 +1,7 @@
+from django.db import models
+
 from wagtail.wagtailadmin.edit_handlers import (
-    ObjectList, StreamFieldPanel, TabbedInterface
+    FieldPanel, ObjectList, StreamFieldPanel, TabbedInterface
 )
 from wagtail.wagtailcore import blocks
 from wagtail.wagtailcore.fields import StreamField
@@ -7,7 +9,7 @@ from wagtail.wagtailcore.models import PageManager
 from wagtail.wagtailimages.blocks import ImageChooserBlock
 from wagtail.wagtailsearch import index
 
-from jobmanager.models import JobListingList
+from jobmanager.blocks import JobListingList
 from v1 import blocks as v1_blocks
 from v1.atomic_elements import molecules, organisms
 from v1.forms import FilterableListForm
@@ -16,11 +18,19 @@ from v1.models.learn_page import AbstractFilterPage
 
 
 class SublandingPage(CFGOVPage):
+    portal_topic = models.ForeignKey(
+        'v1.PortalTopic',
+        blank=True,
+        null=True,
+        related_name='portal_pages',
+        on_delete=models.SET_NULL,
+        help_text='Select a topic if this is a MONEY TOPICS portal page.')
     header = StreamField([
         ('hero', molecules.Hero()),
     ], blank=True)
     content = StreamField([
         ('text_introduction', molecules.TextIntroduction()),
+        ('notification', molecules.Notification()),
         ('featured_content', organisms.FeaturedContent()),
         ('full_width_text', organisms.FullWidthText()),
         ('info_unit_group', organisms.InfoUnitGroup()),
@@ -31,7 +41,6 @@ class SublandingPage(CFGOVPage):
         ('table_block', organisms.AtomicTableBlock(
             table_options={'renderer': 'html'}
         )),
-        ('formfield_with_button', molecules.FormFieldWithButton()),
         ('reg_comment', organisms.RegComment()),
         ('feedback', v1_blocks.Feedback()),
     ], blank=True)
@@ -58,6 +67,7 @@ class SublandingPage(CFGOVPage):
     content_panels = CFGOVPage.content_panels + [
         StreamFieldPanel('header'),
         StreamFieldPanel('content'),
+        FieldPanel('portal_topic'),
     ]
 
     sidebar_panels = [

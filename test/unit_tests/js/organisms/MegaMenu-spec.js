@@ -1,6 +1,5 @@
-import { simulateEvent } from '../../../util/simulate-event';
-
 import MegaMenu from '../../../../cfgov/unprocessed/js/organisms/MegaMenu';
+import { simulateEvent } from '../../../util/simulate-event';
 
 const BASE_CLASS = 'o-mega-menu';
 const HTML_SNIPPET = `
@@ -340,6 +339,13 @@ describe( 'MegaMenu', () => {
       }
 
       simulateEvent( 'click', menuTrigger );
+
+      /* The transitionend event should fire on its own,
+         but for some reason the transitionend event is not firing within JSDom.
+         In a future JSDom update this should be revisited.
+         See https://github.com/jsdom/jsdom/issues/1781
+      */
+      firstContent.dispatchEvent( new Event( 'transitionend' ) );
 
       window.setTimeout( resolveClick, 1000 );
     } );

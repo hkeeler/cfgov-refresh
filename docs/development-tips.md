@@ -59,7 +59,7 @@ In addition to the aforementioned list,
 have their own installation requirements.
 
 If using Docker, follow
-[these guidelines](https://github.com/cfpb/cfgov-refresh/blob/master/docs/usage.md#develop-satellite-apps).
+[these guidelines](../running-docker#work-on-satellite-apps).
 
 Otherwise, if not using Docker, follow these guidelines:
 
@@ -83,17 +83,3 @@ Otherwise, if not using Docker, follow these guidelines:
 !!! note
     After running `gulp build` the site's assets are copied over to `cfgov\static_built`,
     ready to be served by Django.
-
-### TIP: Debugging site performance
-
-When running locally it is possible to enable the
-[Django Debug Toolbar](https://django-debug-toolbar.readthedocs.io/en/stable/)
-by defining the `ENABLE_DEBUG_TOOLBAR` environment variable:
-
-```sh
-$ ENABLE_DEBUG_TOOLBAR=1 ./runserver.sh
-```
-
-This tool exposes various useful pieces of information about things like HTTP headers,
-Django settings, SQL queries, and template variables. Note that running with the toolbar on
-may have an impact on local server performance.

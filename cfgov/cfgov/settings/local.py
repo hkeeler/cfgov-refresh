@@ -23,7 +23,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'handlers': {
         'console': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
         }
     },
@@ -36,16 +36,23 @@ LOGGING = {
     }
 }
 
+# Log database queries.
+if os.environ.get('ENABLE_SQL_LOGGING'):
+    LOGGING['loggers']['django.db.backends'] = {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+        'propagate': False,
+    }
+
 # Django Debug Toolbar
 if os.environ.get('ENABLE_DEBUG_TOOLBAR'):
     INSTALLED_APPS += ('debug_toolbar',)
-
-    INTERNAL_IPS = (os.environ.get('INTERNAL_IP', '127.0.0.1'), )
 
     MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
 
     DEBUG_TOOLBAR_CONFIG = {
         'SHOW_COLLAPSED': True,
+        'SHOW_TOOLBAR_CALLBACK': lambda request: DEBUG,
     }
 
 
