@@ -1,0 +1,33 @@
+FROM centos:7
+
+# logging to the console breaks without this
+ENV PYTHONUNBUFFERED 1
+ENV PYTHONFAULTHANDLER 1
+ENV SCL_PYTHON_VERSION=python27
+
+WORKDIR /usr/app/src
+
+# FIXME: Limit this to just what's needed
+COPY requirements requirements
+
+RUN yum -y install centos-release-scl epel-release && \
+    curl --silent --location https://rpm.nodesource.com/setup_8.x | bash - && \
+    curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo && \
+    yum -y install ${SCL_PYTHON_VERSION} gcc httpd-devel libffi-devel postgresql-devel yarn && \
+    source /opt/rh/${SCL_PYTHON_VERSION}/enable && \
+    pip install --upgrade pip setuptools && \
+    pip install --no-cache-dir -r requirements/deployment.txt
+   
+EXPOSE 8000
+
+COPY . .
+
+#RUN sed 's/@use-font-cdn: false;/@use-font-cdn: true;/g' && \
+RUN ./frontend.sh production
+
+USER apache
+
+#WORKDIR cfgov
+
+ENTRYPOINT [ "./docker-entrypoint.sh"]
+CMD []

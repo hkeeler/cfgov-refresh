@@ -1,52 +1,73 @@
-version: "3.3"
+version: "3.7"
 
 services:
-    elasticsearch:
-        build:
-            context: ./
-            dockerfile: ./docker/elasticsearch/Dockerfile
-        ports:
-            - "9200:9200"
-            - "9300:9300"
-    postgres:
-        image: postgres:10.3
-        restart: always
-        environment:
-            POSTGRES_USER: cfpb
-            POSTGRES_PASSWORD: cfpb
-            POSTGRES_DB: cfgov
-    python:
-        build: .
-        ports:
-            - "8000:8000"
-        environment:
-            ES_HOST: elasticsearch
-        volumes:
-            - ./:/src/cfgov-refresh
-            - ./develop-apps:/src/develop-apps
-        entrypoint:
-            - sh
-            - /src/cfgov-refresh/cfgov/entrypoint.sh
-        depends_on:
-            - elasticsearch
-            - postgres
-        working_dir: /src/cfgov-refresh
-        stdin_open: true
-        tty: true
-    docs:
-        build:
-            context: ./
-            dockerfile: ./docker/docs/Dockerfile
-        ports:
-            - "8888:8888"
-        environment:
-            LANG: en_US.utf8
-            LC_ALL: en_US.utf8
-        volumes:
-            - ./:/src/cfgov-refresh
-        entrypoint:
-            - sh
-            - /src/cfgov-refresh/docker/docs/entrypoint.sh
-        working_dir: /src/cfgov-refresh
-        stdin_open: true
-        tty: true
+
+  elasticsearch:
+    build:
+      context: .
+      dockerfile: docker/elasticsearch/Dockerfile
+    ports:
+      - "9200:9200"
+
+  postgres:
+    image: postgres:10.3
+    restart: always
+    environment:
+      POSTGRES_USER: cfpb
+      POSTGRES_PASSWORD: cfpb
+      POSTGRES_DB: cfgov
+
+  app_py2:
+    build:
+      context: .
+      dockerfile: Dockerfile.${CFGOV_IMAGE_BASE-centos}
+    ports:
+      - 8000:8000
+    environment:
+      DJANGO_SETTINGS_MODULE: cfgov.settings.production
+      #DJANGO_STATIC_ROOT: 
+      DB_HOST: postgres
+      DB_USERNAME: cfpb
+      DB_PASSWORD: cfpb
+      ES_HOST: elasticsearch
+      ALLOWED_HOSTS: "[\"localhost\"]"
+#    volumes:
+#      - ./:/usr/app/src/
+    depends_on:
+      - elasticsearch
+      - postgres
+
+  app_py3:
+    build:
+      context: .
+      dockerfile: Dockerfile.${CFGOV_IMAGE_BASE-centos}
+      args:
+        pythonversion: '3.6'
+
+    ports:
+      - 8333:8000
+    environment:
+      DJANGO_SETTINGS_MODULE: cfgov.settings.production
+      #DJANGO_STATIC_ROOT: 
+      DB_HOST: postgres
+      DB_USERNAME: cfpb
+      DB_PASSWORD: cfpb
+      ES_HOST: elasticsearch
+      ALLOWED_HOSTS: "[\"localhost\"]"
+#    volumes:
+#      - ./:/usr/app/src/
+    depends_on:
+      - elasticsearch
+      - postgres
+
+  docs:
+    build:
+      context: ./docker/docs
+      dockerfile: Dockerfile
+    ports:
+      - 8888:8888
+    environment:
+      LANG: en_US.utf8
+      LC_ALL: en_US.utf8
+    volumes:
+      - ./:/usr/app/src/

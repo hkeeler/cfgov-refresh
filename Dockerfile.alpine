@@ -1,0 +1,55 @@
+ARG pythonversion=2.7
+FROM python:${pythonversion}-alpine AS cfgov-base
+
+# logging to the console breaks without this
+ENV PYTHONUNBUFFERED 1
+ENV PYTHONFAULTHANDLER 1
+
+WORKDIR /usr/app/src
+
+RUN apk add --no-cache apache2 postgresql-libs
+
+# Image with all dev and build tools included
+FROM cfgov-base AS cfgov-build
+
+#RUN apk add --no-cache --virtual .build-deps apache2-dev gcc jpeg-dev libffi-dev libxml2-dev libxslt-dev musl-dev postgresql-dev && \
+#    pip install --no-cache-dir -r requirements/deployment.txt
+#    apk --purge del .build-deps
+
+RUN apk add --no-cache \
+        apache2-dev \
+        gcc \
+        jpeg-dev \
+        libffi-dev \
+        libxml2-dev \
+        libxslt-dev \
+        make \
+        musl-dev \
+        nodejs \
+        npm \
+        postgresql-dev \
+        yarn
+
+COPY requirements ./requirements
+
+# Not all satellite apps work in Python 3.  They are only installed
+# when PYTHON_VERSION is 2.7.x.
+RUN env | sort && \
+    cd requirements && \
+    pip install --no-cache-dir -r deployment.txt -r optional-public.txt
+
+COPY . .
+
+RUN sh ./frontend.sh production
+
+#USER apache
+
+WORKDIR cfgov
+
+EXPOSE 8000
+
+#ENTRYPOINT [ "mod_wsgi-express","start-server"]
+#CMD [ "wsgi.py" ]
+
+ENTRYPOINT []
+CMD sh -c 'env | sort && mod_wsgi-express start-server wsgi.py || echo "Error log:\n"; cat /tmp/mod_wsgi-localhost:8000:100/error_log'
