@@ -41,7 +41,7 @@ FROM cfgov-runtime AS cfgov-dev
 
 COPY . .
 
-RUN ./frontend.sh production
+#RUN ./frontend.sh production
 
 USER apache
 
