@@ -93,6 +93,8 @@ INSTALLED_APPS = (
     'treemodeladmin',
     'housing_counselor',
     'hmda',
+
+    'mod_wsgi.server',
 )
 
 OPTIONAL_APPS = [

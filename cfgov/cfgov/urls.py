@@ -544,6 +544,13 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,
                           document_root=settings.MEDIA_ROOT)
 
+    # this is duplicates functionality of the
+    # django.contrib.staticfiles version of runserver
+    # but useful under runmodwsgi
+    urlpatterns.append(
+        url(r'^static/(?P<path>.*)$',
+            staticfiles_views.serve))
+
     # enable local preview of error pages
     urlpatterns.append(
         url(r'^500/$',
