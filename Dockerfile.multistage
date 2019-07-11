@@ -1,0 +1,47 @@
+FROM centos:7 as cfgov-runtime
+
+ARG scl_python_version=python27
+
+ENV SCL_PYTHON_VERSION ${scl_python_version}
+
+# logging to the console breaks without this
+ENV PYTHONUNBUFFERED 1
+ENV PYTHONFAULTHANDLER 1
+
+SHELL ["/bin/bash", "--login", "-c"]
+
+WORKDIR /src/cfgov-refresh
+
+USER root
+
+# Install common OS packages and enable SCL Python
+RUN yum -y install centos-release-scl epel-release && \
+    yum -y install ${SCL_PYTHON_VERSION} httpd mailcap postgresql10 which && \
+    echo "source scl_source enable ${SCL_PYTHON_VERSION}" | \
+        tee --append /root/.bashrc /etc/profile.d/enable_scl_python.sh && \
+    source /root/.bashrc && \
+    pip install --upgrade pip setuptools
+
+COPY requirements requirements
+
+# Install common Python packages
+RUN yum  -y install gcc httpd-devel postgresql-devel && \
+    pip install --no-cache-dir -r requirements/deployment.txt  && \
+    yum -y remove gcc httpd-devel postgresql-devel && \
+    yum clean all && rm -rf /var/cache/yum
+
+EXPOSE 8000
+
+ENTRYPOINT ./docker-entrypoint.sh
+CMD []
+
+
+
+FROM cfgov-runtime AS cfgov-dev
+
+COPY . .
+
+RUN ./frontend.sh production
+
+USER apache
+

@@ -1,8 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 
-# FIXME: Make sure the Dockerfile takes care of this 
-#source /opt/rh/${SCL_PYTHON_VERSION}/enable && \
+set -e
 
-cd cfgov && \
-python manage.py collectstatic && \
-mod_wsgi-express start-server --log-to-terminal cfgov/wsgi.py
+python cfgov/manage.py runmodwsgi 
+--port 8000 \
+--log-to-terminal \
+--working-directory /src/cfgov-refresh/
+--entry-point /src/cfgov-refresh/cfgov/cfgov/wsgi.py
+#--include-file /src/cfgov-refresh/cfgov/apache/include.conf \
+#$EXTRA_MODWSGI_ARGS

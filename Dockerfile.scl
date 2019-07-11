@@ -1,0 +1,48 @@
+FROM centos/httpd-24-centos7:latest
+
+ARG scl_python_version=python27
+
+ENV SCL_PYTHON_VERSION ${scl_python_version}
+
+# logging to the console breaks without this
+ENV PYTHONUNBUFFERED 1
+ENV PYTHONFAULTHANDLER 1
+
+USER root
+
+RUN curl -sL https://rpm.nodesource.com/setup_10.x | bash - && \
+    curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo && \
+    yum -y install \
+        ${SCL_PYTHON_VERSION} \
+        gcc \
+        httpd24-httpd-devel \
+        libffi-devel \
+        postgresql-devel \
+        yarn \
+        && \
+    source scl_source enable ${SCL_PYTHON_VERSION} && \
+    pip install --no-cache-dir --upgrade pip setuptools && \
+    npm install --global yarn && \
+    pip --version && \
+    yarn --version
+
+
+#WORKDIR /usr/app/src
+
+COPY requirements requirements
+
+RUN source scl_source enable httpd24 ${SCL_PYTHON_VERSION} && \
+    cd requirements && \
+    pip install --no-cache-dir -r deployment.txt -r optional-public.txt
+
+# FIXME: Limit this to just what's needed for the frontend build...if possible
+COPY . .
+
+RUN ./frontend.sh production
+
+USER default
+
+EXPOSE 8000
+
+ENTRYPOINT [ "./docker-entrypoint.sh"]
+CMD []
