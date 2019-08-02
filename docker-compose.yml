@@ -13,6 +13,7 @@ services:
         image: postgres:10.3
         restart: always
         volumes:
+          - ./docker/postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
           - postgres_data:/var/lib/postgresql/data/
         environment:
             POSTGRES_USER: cfpb
