@@ -30,6 +30,9 @@ services:
             target: cfgov-develop
             args:
                 scl_python_version: python27
+        environment:
+            # Django migrations run at container start with CFGOV_AUTO_INIT_DB=ON
+            AUTO_INIT_DB: ${CFGOV_AUTO_INIT_DB:-OFF}
         ports:
             - "8000:8000"
         volumes:
@@ -48,6 +51,9 @@ services:
             target: cfgov-develop
             args:
                 scl_python_version: rh-python36
+        environment:
+            # Hardcoded to OFF so only one container runs Django migrations
+            AUTO_INIT_DB: 'OFF'
         ports:
             - "8333:8000"
         volumes:
